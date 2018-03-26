@@ -2,7 +2,7 @@
 
 
 # set the locations that we will look for changed assets to determine whether to precompile
-set :assets_dependencies, %w(app/assets lib/assets vendor/assets Gemfile.lock config/routes.rb)
+set :assets_dependencies, %w(app/assets lib/assets vendor/assets Gemfile.lock config/routes.rb yarn.lock app/javascript)
 
 # clear the previous precompile task
 Rake::Task["deploy:assets:precompile"].clear_actions
@@ -48,6 +48,16 @@ namespace :deploy do
                 execute(:test, '-L', release_asset_path.to_s)
               rescue
                 execute(:cp, '-r', latest_release_path.join('public', fetch(:assets_prefix)), release_asset_path.parent)
+              end
+
+              # Webpacker assets
+              # copy over all of the assets from the last release
+              release_asset_path = release_path.join('public/packs')
+              # skip if assets directory is symlink
+              begin
+                execute(:test, '-L', release_asset_path.to_s)
+              rescue
+                execute(:cp, '-r', latest_release_path.join('public/packs'), release_asset_path.parent)
               end
 
               # check that the manifest has been created correctly, if not
