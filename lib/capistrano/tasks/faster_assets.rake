@@ -13,7 +13,7 @@ namespace :deploy do
   namespace :assets do
     desc "Precompile assets"
     task :precompile do
-      on roles(fetch(:assets_roles)) do
+      on roles(fetch(:asset_precompiler)) do
         within release_path do
           with rails_env: fetch(:rails_env) do
             begin
@@ -75,7 +75,8 @@ namespace :deploy do
               end
 
             rescue PrecompileRequired
-              execute(:rake, "assets:precompile")
+              execute "mkdir -p #{shared_path}/assets && ln -nfs #{shared_path}/public/assets #{release_path}/public/assets"
+              execute "cd #{release_path} && RAILS_ENV=#{fetch(:rails_env)} RAILS_GROUPS=assets bundle exec rake assets:precompile --trace"
             end
           end
         end
