@@ -4,8 +4,6 @@
 # set the locations that we will look for changed assets to determine whether to precompile
 set :assets_dependencies, %w(app/assets lib/assets vendor/assets Gemfile.lock config/routes.rb yarn.lock app/javascript)
 
-# clear the previous precompile task
-Rake::Task["deploy:assets:precompile"].clear_actions
 class PrecompileRequired < StandardError;
 end
 
